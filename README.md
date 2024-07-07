@@ -4,3 +4,8 @@ An officical implementation of "MFH: Marrying Frequency Domain with Handwritten 
 <img src="https://github.com/Hryxyhe/MFH/raw/master/material/Pipeline.jpg" width="800px">
 <img src="https://github.com/Hryxyhe/MFH/raw/master/material/FAB.jpg" width="800px" height="400px">
 
+# Installation
+Our experiments are implemented on the following environments: Four NVIDIA 3090 GPUs, Python: 3.7.16 PyTorch-lighting: 1.4.9 Pytorch: 1.13 CUDA: 11.7
+` `` 
+conda create -y -n CoMER python=3.7
+` ``
