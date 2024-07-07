@@ -12,7 +12,7 @@ conda create -y -n MFH python=3.7.16
 conda activate MFH
 conda install pytorch==1.13.1 torchvision==0.14.1 pytorch-cuda=11.7 -c pytorch -c nvidia
 # training dependency
-pip install pytorch-lightning==1.4.9 torchmetrics==0.6.0 pandoc==2.3
+pip install pytorch-lightning==1.4.9 torchmetrics==0.6.0 pandoc==2.3 scipy torch_dct
 pip install -e .
 ```
 # Training
