@@ -21,7 +21,11 @@ the training stage. So you also don't any additional preprocessing for the data.
 
 <img src="https://github.com/Hryxyhe/MFH/blob/master/demos/data processing.jpg">
 
-Simply run the following code as same as CoMER:
+We also propose Fusion and Alignment Block (FAB) to mix spatial domain features and frequency domain features.
+
+<img src="https://github.com/Hryxyhe/MFH/blob/master/demos/FAB.jpg">
+
+Simply run the following code as same as CoMER to start training:
 ```
 python train.py --config config.yaml 
 ```
