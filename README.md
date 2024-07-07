@@ -10,7 +10,7 @@ git clone https://github.com/Hryxyhe/MFH.git
 cd MFH
 conda create -y -n MFH python=3.7.16
 conda activate MFH
-conda install pytorch=1.8.1 torchvision=0.2.2 cudatoolkit=11.1 pillow=8.4.0 -c pytorch -c nvidia
+conda install pytorch==1.13.1 torchvision==0.14.1 pytorch-cuda=11.7 -c pytorch -c nvidia
 # training dependency
 conda install pytorch-lightning=1.4.9 torchmetrics=0.6.0 -c conda-forge
 # evaluating dependency
