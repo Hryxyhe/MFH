@@ -7,7 +7,7 @@ trainer:
         logging_interval: epoch
     - class_path: pytorch_lightning.callbacks.ModelCheckpoint
       init_args:
-        save_top_k: 1
+        save_top_k: 5
         monitor: val_ExpRate
         mode: max
         filename: '{epoch}-{step}-{val_ExpRate:.4f}'
