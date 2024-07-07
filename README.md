@@ -25,3 +25,7 @@ the training stage. So you also don't any additional preprocessing for the data.
 python train.py --config config.yaml 
 ```
 You could modify the ```config.yaml``` according to your available gpus.
+```
+gpus: 0,1,2,3 #change gpu ids here
+accelerator: ddp
+```
