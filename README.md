@@ -18,3 +18,5 @@ conda install pytorch-lightning=1.4.9 torchmetrics=0.6.0 -c conda-forge
 conda install pandoc=1.19.2.1 -c conda-forge
 pip install -e .
 ```
+#Training
+Our code are primarily based on [CoMER Project](https://github.com/Green-Wood/CoMER)
