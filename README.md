@@ -18,5 +18,10 @@ conda install pytorch-lightning=1.4.9 torchmetrics=0.6.0 -c conda-forge
 conda install pandoc=1.19.2.1 -c conda-forge
 pip install -e .
 ```
-#Training
-Our code are primarily based on [CoMER Project](https://github.com/Green-Wood/CoMER)
+# Training
+Our code are primarily based on [CoMER Project](https://github.com/Green-Wood/CoMER). Besides, we implement discrete cosine transform (DCT) on input images. This will be done during data loading, before 
+the training stage. So you also don't any additional preprocessing for the data. Simply run the following code as same as CoMER:
+```
+python train.py --config config.yaml 
+```
+You could modify the config.yaml according to available gpus you could use.
