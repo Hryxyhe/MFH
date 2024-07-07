@@ -1,7 +1,7 @@
 # MFH
 An officical implementation of "MFH: Marrying Frequency Domain with Handwritten Mathematical Expression Recognition" (Accepted by PRCV 2024). We implement our method based on [CoMER](https://arxiv.org/abs/2207.04410).
   
-<img src="https://github.com/Hryxyhe/MFH/raw/master/material/Pipeline.jpg" width="1000px" height="400px" >
+<img src="https://github.com/Hryxyhe/MFH/blob/master/demos/Pipeline.jpg" width="1000px" height="400px" >
 
 # Installation
 Our experiments are implemented on the following environments: Python:3.7.16  PyTorch-lighting:1.4.9  Pytorch:1.13  CUDA:11.7
