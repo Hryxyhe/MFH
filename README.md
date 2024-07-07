@@ -23,7 +23,7 @@ the training stage. So you also don't any additional preprocessing for the data.
 
 We also propose Fusion and Alignment Block (FAB) to mix spatial domain features and frequency domain features.
 
-<img src="https://github.com/Hryxyhe/MFH/blob/master/demos/FAB.jpg">
+<img src="https://github.com/Hryxyhe/MFH/blob/master/demos/FAB.jpg" width='200px'>
 
 Simply run the following code as same as CoMER to start training:
 ```
