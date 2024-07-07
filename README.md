@@ -3,4 +3,5 @@ An officical implementation of "MFH: Marrying Frequency Domain with Handwritten 
 ![](https://github.com/Hryxyhe/MFH/raw/master/material/Pipeline.jpg)  
 ![](https://github.com/Hryxyhe/MFH/raw/master/material/FAB.jpg)  
 <img src="https://github.com/Hryxyhe/MFH/raw/master/material/Pipeline.jpg" width="1000px">
+<img src="https://github.com/Hryxyhe/MFH/raw/master/material/FAB.jpg" width="1000px" height="400px">
 
