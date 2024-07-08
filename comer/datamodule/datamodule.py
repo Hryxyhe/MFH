@@ -43,12 +43,12 @@ def data_iterator(
         if size > biggest_image_size:
             biggest_image_size = size
         batch_image_size = biggest_image_size * (i + 1)
-        # if len(lab) > maxlen:
-        #     print("sentence", i, "length bigger than", maxlen, "ignore")
-        # elif size > maxImagesize:
-        #     print(
-        #         f"image: {fname} size: {fea.shape[0]} x {fea.shape[1]} =  bigger than {maxImagesize}, ignore"
-        #     )
+        if len(lab) > maxlen:
+            print("sentence", i, "length bigger than", maxlen, "ignore")
+        elif size > maxImagesize:
+            print(
+                f"image: {fname} size: {fea.shape[0]} x {fea.shape[1]} =  bigger than {maxImagesize}, ignore"
+            )
 
         if batch_image_size > batch_Imagesize or i == batch_size:  # a batch is full
             fname_total.append(fname_batch)
@@ -169,7 +169,7 @@ class CROHMEDatamodule(pl.LightningDataModule):
             train_batch_size: int = 8,
             eval_batch_size: int = 4,
             num_workers: int = 5,
-            freq_ratio: int = 3,
+            freq_remove_num: int = 3,
             scale_aug: bool = False,
     ) -> None:
         super().__init__()
@@ -179,8 +179,9 @@ class CROHMEDatamodule(pl.LightningDataModule):
         self.train_batch_size = train_batch_size
         self.eval_batch_size = eval_batch_size
         self.num_workers = num_workers
+        self.freq_remove_num = freq_remove_num
         self.scale_aug = scale_aug
-        self.freq_ratio = freq_ratio
+
         print(f"Load data from: {self.zipfile_path}")
 
     def setup(self, stage: Optional[str] = None) -> None:
@@ -188,22 +189,22 @@ class CROHMEDatamodule(pl.LightningDataModule):
             if stage == "fit" or stage is None:
                 self.train_dataset = CROHMEDataset(
                     build_dataset(archive, "train", self.train_batch_size),
-                    self.freq_ratio,
                     True,
                     self.scale_aug,
+                    self.freq_remove_num
                 )
                 self.val_dataset = CROHMEDataset(
                     build_dataset(archive, self.test_year, self.eval_batch_size),
-                    self.freq_ratio,
                     False,
                     self.scale_aug,
+                    self.freq_remove_num
                 )
             if stage == "test" or stage is None:
                 self.test_dataset = CROHMEDataset(
                     build_dataset(archive, self.test_year, self.eval_batch_size),
-                    self.freq_ratio,
                     False,
                     self.scale_aug,
+                    self.freq_remove_num
                 )
 
     def train_dataloader(self):
@@ -220,7 +221,7 @@ class CROHMEDatamodule(pl.LightningDataModule):
             shuffle=False,
             num_workers=self.num_workers,
             collate_fn=collate_fn,
-        )
+        ),
 
     def test_dataloader(self):
         return DataLoader(

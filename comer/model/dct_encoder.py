@@ -1,9 +1,9 @@
 import torch.nn as nn
 from einops.einops import rearrange
 from .pos_enc import ImgPosEnc
-from .mlp_mixer import Block
+from .mlp_block import MlpBlock
 import copy
-
+from torch import FloatTensor, LongTensor
 
 class PatchEmbed(nn.Module):
     """ Image to Patch Embedding
@@ -30,15 +30,20 @@ class DCTNet(nn.Module):
         super(DCTNet, self).__init__()
         self.patch_embed = PatchEmbed(embed_dim=d_model, patch_size=8, in_chans=1)
         self.out_channel = d_model
-        # self.conv_layers = VGG1()
         self.channel_att = ChannelAtt(d_model, 16)
         self.pos_enc_2d = ImgPosEnc(256, normalize=True)
         self.norm = nn.LayerNorm(256)
-        self.mlps = _get_clones(Block(d_model=d_model), num_mlp_layers)
+        self.mlps = _get_clones(MlpBlock(d_model=d_model), num_mlp_layers)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)
 
-    def forward(self, x, mask):  # [4, 1, H, W]
-        x = self.patch_embed(x)  # [4,256,H//8,W//8]
+    def forward(self, x: FloatTensor, mask: LongTensor) -> FloatTensor:
+        """ Frequency Feature Extractor in MFH
+
+        @param x: FloatTensor [b, 1, h, w]
+        @param mask: LongTensor [b, h, w]
+        @return: FloatTensor [b, h, w, d]
+        """
+        x = self.patch_embed(x)  # [b,256,H//8,W//8]
         x_mlp = rearrange(x, "b d h w -> b h w d")
         for i, mod in enumerate(self.mlps):
             x_mlp = mod(x_mlp)

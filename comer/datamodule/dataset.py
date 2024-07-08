@@ -14,7 +14,7 @@ W_HI = 1024
 
 
 class CROHMEDataset(Dataset):
-    def __init__(self, ds, freq_ratio: int, is_train: bool, scale_aug: bool) -> None:
+    def __init__(self, ds, is_train: bool, scale_aug: bool, freq_remove_num: int) -> None:
         super().__init__()
         self.ds = ds
 
@@ -27,18 +27,15 @@ class CROHMEDataset(Dataset):
             tr.ToTensor(),
         ]
         self.transform = tr.Compose(trans_list)
-        self.dct = DCT(block_size=8, freq_ratio=freq_ratio)
-
+        self.dct = DCT(block_size=8, freq_remove_num=freq_remove_num)
     def __getitem__(self, idx):
         fname, img, caption = self.ds[idx]
-
         img = [self.transform(im) for im in img]
-        img_dct = copy.deepcopy(img)
+        img_dct = copy.deepcopy(img)  # gain the copy of input image for DCT
         img_dct = [self.dct(x) for x in img_dct]
-
         return fname, img, caption, img_dct
-
-        # return fname, img, caption
 
     def __len__(self):
         return len(self.ds)
+
+

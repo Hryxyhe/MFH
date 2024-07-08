@@ -1,7 +1,5 @@
-import torch
 import torch.nn as nn
-import torch_dct as dct
-
+from torch import FloatTensor
 
 def drop_path(x, drop_prob: float = 0., training: bool = False, scale_by_keep: bool = True):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
@@ -51,8 +49,9 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-class Block(nn.Module):
-
+class MlpBlock(nn.Module):
+    """ Mlp block in MFH
+    """
     def __init__(self, d_model=256, mlp_ratio=4., drop=0.3, drop_path=0.3, act_layer=nn.GELU, norm_layer=nn.LayerNorm,
                  ):
         super().__init__()
@@ -63,9 +62,13 @@ class Block(nn.Module):
         self.mlp1 = Mlp(in_features=d_model, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
         self.mlp2 = Mlp(in_features=d_model, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
 
-    def forward(self, tgt):
-        tgt_t = tgt
-        tgt0 = tgt + self.drop_path(self.mlp1(self.norm1(tgt_t)))
-        tgt2 = tgt0 + self.drop_path(self.mlp2(self.norm2(tgt0)))
+    def forward(self, x: FloatTensor) -> FloatTensor:
+        """ MLP Block
 
-        return tgt2
+        @param x: FloatTensor [b, h', w', 256]
+        @return: FloatTensor [b, h', w', 256]
+        """
+        tmp = x + self.drop_path(self.mlp1(self.norm1(x)))
+        output = tmp + self.drop_path(self.mlp2(self.norm2(tmp)))
+
+        return output

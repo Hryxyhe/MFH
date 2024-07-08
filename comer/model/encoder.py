@@ -156,7 +156,6 @@ class Encoder(pl.LightningModule):
         self, img: FloatTensor, img_mask: LongTensor
     ) -> Tuple[FloatTensor, LongTensor]:
         """encode image to feature
-
         Parameters
         ----------
         img : FloatTensor

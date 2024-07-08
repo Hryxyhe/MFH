@@ -1,8 +1,7 @@
 import os
-import sys
-
-# sys.path.append('your absolute path-to-this project')
-sys.path.append("/home/ipad_3d/yhx_wqw/MFH/")
+# import sys
+# sys.path.append('/path/to/your/project/folder')
+# maybe occur path error, comment above codes to solve
 import typer
 from comer.datamodule.datamodule import CROHMEDatamodule
 from comer.lit_comer import LitCoMER
@@ -10,25 +9,21 @@ from pytorch_lightning import Trainer, seed_everything
 
 seed_everything(7)
 
-
-# def main(version: str, test_year: str):
-def main(version: str):
-    test_years = ['2014', '2016', '2019']
+def main(version: str, test_year: str):
     # generate output latex in result.zip
-    for test_year in test_years:
-        ckp_folder = os.path.join("lightning_logs", f"version_{version}", "checkpoints")
-        fnames = os.listdir(ckp_folder)
-        assert len(fnames) == 1
-        ckp_path = os.path.join(ckp_folder, fnames[0])
-        print(f"Test with fname: {fnames[0]}")
+    ckp_folder = os.path.join("lightning_logs", f"version_{version}", "checkpoints")
+    fnames = os.listdir(ckp_folder)
+    assert len(fnames) == 1
+    ckp_path = os.path.join(ckp_folder, fnames[0])
+    print(f"Test with fname: {fnames[0]}")
 
-        trainer = Trainer(logger=False, gpus=1)
+    trainer = Trainer(logger=False, gpus=1)
 
-        dm = CROHMEDatamodule(test_year=test_year, eval_batch_size=4)
+    dm = CROHMEDatamodule(test_year=test_year, eval_batch_size=4)
 
-        model = LitCoMER.load_from_checkpoint(ckp_path)
+    model = LitCoMER.load_from_checkpoint(ckp_path, strict=True)
 
-        trainer.test(model, datamodule=dm)
+    trainer.test(model, datamodule=dm)
 
 
 if __name__ == "__main__":

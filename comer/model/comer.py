@@ -8,8 +8,6 @@ from comer.utils.utils import Hypothesis
 from .dct_encoder import DCTNet
 from .decoder import Decoder
 from .encoder import Encoder
-import cv2
-import numpy as np
 
 
 class CoMER(pl.LightningModule):
@@ -28,13 +26,11 @@ class CoMER(pl.LightningModule):
             self_coverage: bool,
     ):
         super().__init__()
-        self.FAB = FAB(in_dim=256)
         self.encoder = Encoder(
             d_model=d_model, growth_rate=growth_rate, num_layers=num_layers
         )
         self.dct_encoder = DCTNet(
-            d_model=d_model, num_mlp_layers=num_mlp_layers
-        )
+            d_model=d_model, num_mlp_layers=num_mlp_layers)
         self.decoder = Decoder(
             d_model=d_model,
             nhead=nhead,
@@ -45,6 +41,7 @@ class CoMER(pl.LightningModule):
             cross_coverage=cross_coverage,
             self_coverage=self_coverage,
         )
+        self.FAB = FAB(in_dim=d_model)
 
     def forward(
             self, img: FloatTensor, img_mask: LongTensor, tgt: LongTensor, img_dct: FloatTensor
@@ -58,6 +55,8 @@ class CoMER(pl.LightningModule):
             [b, h, w]
         tgt : LongTensor
             [2b, l]
+        img_dct: FloatTensor
+            [b, 1, h', w']
         Returns
         -------
         FloatTensor
@@ -92,6 +91,8 @@ class CoMER(pl.LightningModule):
             [b, 1, h', w']
         img_mask: LongTensor
             [b, h', w']
+        img_dct: FloatTensor
+            [b, 1, h', w']
         beam_size : int
         max_len : int
 
@@ -105,8 +106,10 @@ class CoMER(pl.LightningModule):
         return self.decoder.beam_search(
             [feature], [mask], beam_size, max_len, alpha, early_stopping, temperature)
 
-
 class FAB(nn.Module):
+    """
+    Fusion and Alignment Block (FAB) in MFH
+    """
     def __init__(self, in_dim):
         super(FAB, self).__init__()
         self.conv = nn.Conv2d(
@@ -119,12 +122,12 @@ class FAB(nn.Module):
         self.v_y = nn.Parameter(torch.randn((1, in_dim, 1, 1)), requires_grad=True)
 
     def forward(self, x, y):
-        x = rearrange(x, " b h w d ->b d h w")
-        y = rearrange(y, " b h w d ->b d h w")
+        x = rearrange(x, "b h w d -> b d h w")
+        y = rearrange(y, "b h w d -> b d h w")
         attmap = self.conv(torch.cat((x, y), 1))
         attmap = torch.sigmoid(attmap)
         x = attmap[:, 0:1, :, :] * x * self.v_x
         y = attmap[:, 1:, :, :] * y * self.v_y
         out = x + y
-        out = rearrange(out, " b d h w ->b h w d")
+        out = rearrange(out, "b d h w  -> b h w d")
         return out

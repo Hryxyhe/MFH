@@ -4,12 +4,12 @@ from typing import List
 import pytorch_lightning as pl
 import torch.optim as optim
 from torch import FloatTensor, LongTensor
-
+import torch
 from comer.datamodule import Batch, vocab
 from comer.model.comer import CoMER
 from comer.utils.utils import (ExpRateRecorder, Hypothesis, ce_loss,
                                to_bi_tgt_out)
-import torch
+
 
 class LitCoMER(pl.LightningModule):
     def __init__(
@@ -36,8 +36,6 @@ class LitCoMER(pl.LightningModule):
             # training
             learning_rate: float,
             patience: int,
-            pretrained: bool,
-            pretrained_weights_path: str,  # 添加预训练权重路径参数
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -55,13 +53,11 @@ class LitCoMER(pl.LightningModule):
             cross_coverage=cross_coverage,
             self_coverage=self_coverage,
         )
-        if pretrained:  # 如果提供了预训练权重路径，则加载权重
-            self.load_pretrained_weights(pretrained_weights_path)
 
         self.exprate_recorder = ExpRateRecorder()
 
     def forward(
-        self, img: FloatTensor, img_mask: LongTensor, tgt: LongTensor, img_dct: FloatTensor
+            self, img: FloatTensor, img_mask: LongTensor, tgt: LongTensor, img_dct: FloatTensor
     ) -> FloatTensor:
         """run img and bi-tgt
 
@@ -73,26 +69,18 @@ class LitCoMER(pl.LightningModule):
             [b, h, w]
         tgt : LongTensor
             [2b, l]
-
+        img_dct: FloatTensor
+            [b, 1, h', w']
         Returns
         -------
         FloatTensor
             [2b, l, vocab_size]
         """
-        return self.comer_model(img, img_mask, tgt,img_dct)
-
-    def load_pretrained_weights(self, pretrained_weights_path: str):
-        pretrained_dict = torch.load(pretrained_weights_path, map_location=lambda storage, loc: storage)
-        model_state_dict_keys = list(self.comer_model.state_dict().keys())
-        pretrained_state_dict = pretrained_dict['state_dict']
-        pretrained_state_dict = {k.replace('comer_model.', ''): v for k, v in pretrained_state_dict.items()}
-        pretrained_state_dict = {k: v for k, v in pretrained_state_dict.items() if k in model_state_dict_keys}
-        self.comer_model.load_state_dict(pretrained_state_dict, strict=False)
-        print('Loaded pretrained model:', pretrained_weights_path)
+        return self.comer_model(img, img_mask, tgt, img_dct)
 
     def training_step(self, batch: Batch, _):
         tgt, out = to_bi_tgt_out(batch.indices, self.device)
-        out_hat = self(batch.imgs, batch.mask, tgt,batch.img_dct)
+        out_hat = self(batch.imgs, batch.mask, tgt, batch.img_dct)
 
         loss = ce_loss(out_hat, out)
         self.log("train_loss", loss, on_step=False, on_epoch=True, sync_dist=True)
@@ -101,7 +89,7 @@ class LitCoMER(pl.LightningModule):
 
     def validation_step(self, batch: Batch, _):
         tgt, out = to_bi_tgt_out(batch.indices, self.device)
-        out_hat = self(batch.imgs, batch.mask, tgt,batch.img_dct)
+        out_hat = self(batch.imgs, batch.mask, tgt, batch.img_dct)
 
         loss = ce_loss(out_hat, out)
         self.log(
@@ -113,7 +101,7 @@ class LitCoMER(pl.LightningModule):
             sync_dist=True,
         )
 
-        hyps = self.approximate_joint_search(batch.imgs, batch.mask,batch.img_dct)
+        hyps = self.approximate_joint_search(batch.imgs, batch.mask, batch.img_dct)
 
         self.exprate_recorder([h.seq for h in hyps], batch.indices)
         self.log(
@@ -125,7 +113,7 @@ class LitCoMER(pl.LightningModule):
         )
 
     def test_step(self, batch: Batch, _):
-        hyps = self.approximate_joint_search(batch.imgs, batch.mask,batch.img_dct)
+        hyps = self.approximate_joint_search(batch.imgs, batch.mask, batch.img_dct)
         self.exprate_recorder([h.seq for h in hyps], batch.indices)
         return batch.img_bases, [vocab.indices2label(h.seq) for h in hyps]
 
@@ -133,17 +121,10 @@ class LitCoMER(pl.LightningModule):
         exprate = self.exprate_recorder.compute()
         print(f"Validation ExpRate: {exprate}")
 
-        with zipfile.ZipFile("result.zip", "w") as zip_f:
-            for img_bases, preds in test_outputs:
-                for img_base, pred in zip(img_bases, preds):
-                    content = f"%{img_base}\n${pred}$".encode()
-                    with zip_f.open(f"{img_base}.txt", "w") as f:
-                        f.write(content)
-
     def approximate_joint_search(
-            self, img: FloatTensor, mask: LongTensor,img_dct:FloatTensor
+            self, img: FloatTensor, mask: LongTensor, img_dct: FloatTensor
     ) -> List[Hypothesis]:
-        return self.comer_model.beam_search(img, mask, img_dct,**self.hparams)
+        return self.comer_model.beam_search(img, mask, img_dct, **self.hparams)
 
     def configure_optimizers(self):
         optimizer = optim.SGD(

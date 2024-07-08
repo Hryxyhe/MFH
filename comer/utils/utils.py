@@ -13,10 +13,10 @@ class Hypothesis:
     score: float
 
     def __init__(
-        self,
-        seq_tensor: LongTensor,
-        score: float,
-        direction: str,
+            self,
+            seq_tensor: LongTensor,
+            score: float,
+            direction: str,
     ) -> None:
         assert direction in {"l2r", "r2l"}
         raw_seq = seq_tensor.tolist()
@@ -63,11 +63,66 @@ class ExpRateRecorder(Metric):
         return exp_rate
 
 
+class ExpRateRecorder_all(Metric):
+    def __init__(self, dist_sync_on_step=False):
+        super().__init__(dist_sync_on_step=dist_sync_on_step)
+
+        self.add_state("total_line", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("rec", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("one", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("two", default=torch.tensor(0.0), dist_reduce_fx="sum")
+
+    def update(self, indices_hat: List[List[int]], indices: List[List[int]]):
+        for pred, truth in zip(indices_hat, indices):
+            pred = vocab.indices2label(pred)
+            truth = vocab.indices2label(truth)
+
+            is_same = pred == truth
+            dist = cal_distance(pred, truth)
+            if is_same:
+                self.rec += 1
+
+            elif dist == 1:
+                self.one += 1
+
+            elif dist == 2:
+                self.two += 1
+
+            self.total_line += 1
+
+    def compute(self) -> float:
+        exp_rate = self.rec / self.total_line
+        error_one = (self.rec + self.one) / self.total_line
+        error_two = (self.rec + self.one + self.two) / self.total_line
+        return exp_rate, error_one, error_two
+
+
+def cal_distance(word1, word2):
+    m = len(word1)
+    n = len(word2)
+    if m * n == 0:
+        return m + n
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(m + 1):
+        dp[i][0] = i
+    for j in range(n + 1):
+        dp[0][j] = j
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            a = dp[i - 1][j] + 1
+            b = dp[i][j - 1] + 1
+            c = dp[i - 1][j - 1]
+            if word1[i - 1] != word2[j - 1]:
+                c += 1
+            dp[i][j] = min(a, b, c)
+    return dp[m][n]
+
+
 def ce_loss(
-    output_hat: torch.Tensor,
-    output: torch.Tensor,
-    ignore_idx: int = vocab.PAD_IDX,
-    reduction: str = "mean",
+        output_hat: torch.Tensor,
+        output: torch.Tensor,
+        ignore_idx: int = vocab.PAD_IDX,
+        reduction: str = "mean",
 ) -> torch.Tensor:
     """comput cross-entropy loss
 
@@ -86,10 +141,10 @@ def ce_loss(
 
 
 def to_tgt_output(
-    tokens: Union[List[List[int]], List[LongTensor]],
-    direction: str,
-    device: torch.device,
-    pad_to_len: Optional[int] = None,
+        tokens: Union[List[List[int]], List[LongTensor]],
+        direction: str,
+        device: torch.device,
+        pad_to_len: Optional[int] = None,
 ) -> Tuple[LongTensor, LongTensor]:
     """Generate tgt and out for indices
 
@@ -142,7 +197,7 @@ def to_tgt_output(
 
     for i, token in enumerate(tokens):
         tgt[i, 0] = start_w
-        tgt[i, 1 : (1 + lens[i])] = token
+        tgt[i, 1: (1 + lens[i])] = token
 
         out[i, : lens[i]] = token
         out[i, lens[i]] = stop_w
@@ -151,7 +206,7 @@ def to_tgt_output(
 
 
 def to_bi_tgt_out(
-    tokens: List[List[int]], device: torch.device
+        tokens: List[List[int]], device: torch.device
 ) -> Tuple[LongTensor, LongTensor]:
     """Generate bidirection tgt and out
 
