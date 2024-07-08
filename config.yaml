@@ -7,15 +7,15 @@ trainer:
         logging_interval: epoch
     - class_path: pytorch_lightning.callbacks.ModelCheckpoint
       init_args:
-        save_top_k: 5
+        save_top_k: 1 # change this to alter the numbers of checkpoints in logs
         monitor: val_ExpRate
         mode: max
         filename: '{epoch}-{step}-{val_ExpRate:.4f}'
   # gpus: 1
-  gpus: 0,1,2,3
+  gpus: 0, 1, 2, 3
   accelerator: ddp
   check_val_every_n_epoch: 2
-  max_epochs: 200
+  max_epochs: 300
   deterministic: true
 model:
   d_model: 256
@@ -40,14 +40,11 @@ model:
   # training
   learning_rate: 0.08
   patience: 20
-  # pre-trained
-  pretrained: false
-  pretrained_weights_path: ""
 data:
   zipfile_path: data.zip
   test_year: 2014
   train_batch_size: 8
   eval_batch_size: 4
   num_workers: 5
-  freq_ratio: 3
+  freq_remove_num: 3
   scale_aug: true
