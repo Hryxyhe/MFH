@@ -17,7 +17,7 @@ pip install -e .
 ```
 # Training
 Our code are primarily based on [CoMER Project](https://github.com/Green-Wood/CoMER). Besides, we implement discrete cosine transform (DCT) on input images. This will be done during data loading, before 
-the training stage. So you also don't any additional preprocessing for the data.
+the training stage. So you also don't need any additional preprocessing for the data.
 
 <img src="https://github.com/Hryxyhe/MFH/blob/master/demos/data processing.jpg">
 
