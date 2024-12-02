@@ -1,7 +1,7 @@
 # <p align="center">MFH：Marrying Frequency Domain with Handwritten Mathematical Expression Recognition</p>
 
 <h5 align="center">
-[![Google Scholar](https://img.shields.io/badge/Arxiv-2406.00684-b31b1b.svg?logo=arXiv)](https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13) 
+[![Google Scholar](https://img.shields.io/badge/github-snowdreams1006-brightgreen.svg)](https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13) 
 </h5>
 
 An officical implementation of "MFH: Marrying Frequency Domain with Handwritten Mathematical Expression Recognition" (Accepted by PRCV 2024). We implement our method based on [CoMER](https://arxiv.org/abs/2207.04410).
