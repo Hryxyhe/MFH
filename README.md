@@ -1,8 +1,13 @@
 # <p align="center">MFH：Marrying Frequency Domain with Handwritten Mathematical Expression Recognition</p>
-<h2 align="center"> <a href="https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13"> </a></h2>
 An officical implementation of "MFH: Marrying Frequency Domain with Handwritten Mathematical Expression Recognition" (Accepted by PRCV 2024). We implement our method based on [CoMER](https://arxiv.org/abs/2207.04410).
   
 <img src="https://github.com/Hryxyhe/MFH/blob/master/demos/Pipeline.jpg" alt='Pipeline of MFH'>
+
+## News 
+* ```2024.8.14 ``` 🚀 OBSD has been selected as the ACL 2024 Best Paper.
+* ```2024.7.15 ``` 🚀 OBSD has been selected as the ACL 2024 Oral.
+* ```2024.5.16 ``` 🚀 OBSD is accepted by ACL 2024 Main. 
+* ```2024.2.15 ``` 🚀 Sourced code for OBSD is released.
 
 # Installation
 Our experiments are implemented on the following environments: Python:3.7.16  PyTorch-lighting:1.4.9  Pytorch:1.13  CUDA:11.7
