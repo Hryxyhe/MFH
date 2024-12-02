@@ -1,5 +1,5 @@
 # <p align="center">MFH：Marrying Frequency Domain with Handwritten Mathematical Expression Recognition</p>
-<h2 align="center"> <a href="(https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13)"> </a></h2>
+<h2 align="center"> <a href="https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13"> </a></h2>
 An officical implementation of "MFH: Marrying Frequency Domain with Handwritten Mathematical Expression Recognition" (Accepted by PRCV 2024). We implement our method based on [CoMER](https://arxiv.org/abs/2207.04410).
   
 <img src="https://github.com/Hryxyhe/MFH/blob/master/demos/Pipeline.jpg" alt='Pipeline of MFH'>
