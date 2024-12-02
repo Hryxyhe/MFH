@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://link.springer.com/chapter/10.1007/978-981-97-8511-7_13">
-    <img src="https://img.shields.io/badge/github-snowdreams1006-brightgreen.svg" alt="Google Scholar">
+    <img src="https://img.shields.io/badge/:badgeContent?style=flat&logoColor=blue&label=Google&labelColor=blue&color=blue
+" alt="Google Scholar">
   </a>
 </p>
 
